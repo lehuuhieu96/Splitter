@@ -1,0 +1,27 @@
+{
+    "name": "transfer_doc",
+    "version": "1.0.0",
+    "description": "",
+    "main": "main.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "electron ."
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "electron": "^29.2.0"
+    },
+    "dependencies": {
+        "axios": "^1.6.8",
+        "child_process": "^1.0.2",
+        "esm": "^3.2.25",
+        "fs": "^0.0.1-security",
+        "mammoth": "^1.7.1",
+        "nodemailer": "^6.9.13",
+        "puppeteer": "^22.6.3",
+        "sharp": "^0.33.3",
+        "util": "^0.12.5",
+        "wmf": "^1.0.2"
+    }
+}

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Splitter</title>
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        display: flex; /*Sử dụng flexbox để căn giữa nút */
+        justify-content: center; /* Căn giữa theo chiều ngang */
+        align-items: center; /* Căn giữa theo chiều dọc */
+        height: 100vh; /* Thiết lập chiều cao của body để nút được căn giữa theo chiều dọc */
+        margin: 0; /* Loại bỏ margin mặc định */
+      }
+      
+      button {
+        /* Thiết lập kiểu dáng của nút */
+        padding: 10px 20px; /* Kích thước nút */
+        font-size: 26px; /* Kích thước chữ */
+        background-color: #007bff; /* Màu nền của nút (màu xanh lá cây) */
+        color: white; /* Màu chữ của nút (trắng) */
+        border: none; /* Loại bỏ viền */
+        border-radius: 8px; /* Bo góc */
+        cursor: pointer; /* Hiển thị con trỏ khi rê chuột vào nút */
+      }
+      
+      button:hover {
+        background-color: #45a049; /* Màu nền của nút khi di chuột qua (màu xanh lá cây nhạt) */
+      }
+      #drop-area {
+        border: 2px dashed #ccc; /* Đường viền đứt */
+        border-radius: 10px; /* Bo góc */
+        padding: 100px 200px; /* Khoảng cách lề bên trong */
+        margin: 60px 100px;
+        text-align: center; /* Căn giữa nội dung */
+        cursor: pointer; /* Hiển thị con trỏ khi rê chuột qua */
+      }
+      #header {
+        position: absolute;
+        top: 10px; /* Đặt top để căn đối tượng với phía trên */
+        left: 50%; /* Đặt left ở giữa trang */
+        transform: translateX(-50%); /* Di chuyển tiêu đề sang trái 50% chiều rộng của chính nó */
+        margin: 0; /* Loại bỏ margin mặc định */
+        font-size: 32px;
+        font-weight: bold;
+      }
+
+      .text-input-file {
+        padding-top: 10px;
+        font-size: 20px;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <body>
+      <div id="header">CẮT FILE WORD</div>
+      <div id="drop-area">
+        <span class="drop-text"></span>
+        <button id="open-file">Chọn Đề</button>
+        <div class="text-input-file">Hoặc Thả Tại Đây!</div>
+      </div>
+      <script src="../../renderer/home.js"></script>
+    </body>
+  </body>
+</html>
