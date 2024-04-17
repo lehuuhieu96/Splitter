@@ -1,4 +1,4 @@
-const {  ipcMain, ipcRenderer } = require("electron");
+const {  ipcMain, ipcRenderer, app } = require("electron");
 const mammoth = require("mammoth");
 const puppeteer = require("puppeteer");
 const { promisify } = require('util');
@@ -13,8 +13,61 @@ function registerEvents() {
     });
 }
 
+// Hàm để load dữ liệu từ tệp JSON
+function loadData() {
+    const filePath = path.join(app.getPath('userData'), 'data.json');
+
+    if (fs.existsSync(filePath)) {
+        const data = JSON.parse(fs.readFileSync(filePath));
+        return data;
+    } else {
+        return []; // Trả về một mảng rỗng nếu không có dữ liệu
+    }
+}
+
 async function createPdfFromHtml(htmlContent, outputPath) {
-    //   const browser = await puppeteer.launch();
+    const data = loadData();
+    const header = data[data.length-1]?.header || '';
+    const footer = data[data.length-1]?.footer || '';
+    const watermark = data[data.length-1]?.watermark || '';
+
+    const processedHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                .watermark {
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    font-size: 100px;
+                    opacity: 0.1;
+                    z-index: -1;
+                }
+                body {
+                    font-size: 22px; /* Đặt kích thước chữ mong muốn */
+                    // background: url('../../images/IMG_20171115_215912.jpg') no-repeat center center;
+                    // background-size: cover;
+                }
+                pre, p, div, span { 
+                    white-space: pre-wrap; 
+                }
+            </style>
+        </head>
+        <body>
+            <header>
+                <h3>${header}</h3>
+            </header>
+            <div class="watermark">${watermark}</div>
+            ${htmlContent} 
+            <footer>
+                <h3>${footer}</h3>
+            </footer>
+        </body>
+        </html>
+    `;
+
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
     const margins = {
@@ -22,22 +75,10 @@ async function createPdfFromHtml(htmlContent, outputPath) {
         bottom: '0.5cm',
         left: '0.5cm',
         right: '0.5cm'
-      };
+        };
 
     // Đặt nội dung HTML cho trang
-    await page.setContent(htmlContent);
-
-    await page.addStyleTag({
-        content: `
-          body {
-            font-size: 22px; /* Đặt kích thước chữ mong muốn */
-          }
-          pre, html, body { 
-            white-space: pre-wrap; 
-          }
-        `
-    });
-
+    await page.setContent(processedHtml);
     // Lấy tất cả các phần tử hình ảnh trên trang
     const images = await page.$$('img');
     // Duyệt qua từng phần tử hình ảnh để tìm hình ảnh WMF và thay thế chúng
@@ -61,8 +102,9 @@ async function createPdfFromHtml(htmlContent, outputPath) {
         }
     }
     // Tạo file PDF từ trang
-    await page.pdf({ path: outputPath, format: "A4", margin: margins });
+    await page.pdf({ path: outputPath, format: "A4", margin: margins, printBackground: true});
     await browser.close();
+
 }
 
 async function convertWMFtoPNG(wmfBase64) {
@@ -101,10 +143,6 @@ function addPrefixToOlLi(str, index) {
     return str;
 }
 
-function addPre(str) {
-    return `<pre>${str}</pre>`
-}
-
 async function convertToPDF(event, inputFilePath) {
     try {
         const value = await mammoth.convertToHtml({ path: inputFilePath });
@@ -112,12 +150,8 @@ async function convertToPDF(event, inputFilePath) {
         const fileName = getFileName(inputFilePath);
         let pdfPaths = []
         // let htmlContents = value?.value?.split(/(?=<p><strong>Câu|<p>Câu|<ol><li>)/).map((str, index) => addPrefixToOlLi(str, index + 1));;
-
         // let htmlContents = value?.value?.split(/(?=<p><strong>Câu|<strong>Câu|<p>Câu|<ol><li>)/).filter(item => item.startsWith('<p><strong>Câu') || item.startsWith('<p><strong>Câu') || item.startsWith('<p>Câu') || item.startsWith('<ol><li>'));
         let htmlContents = value?.value?.split(/(?=<p><strong>Câu|<p>Câu|<ol><li>)/);
-        // let htmlContents = value?.value?.split(/(?=<p><strong>Câu|<p>Câu|<ol><li>)/).map((str) => addPre(str));;
-
-        // console.log('htmlContents', htmlContents);
         if(!htmlContents[0].startsWith('<p><strong>Câu') || !htmlContents[0].startsWith('<p>Câu') || !htmlContents[0].startsWith('<ol><li>')){
             let newHtmlContents = [htmlContents[0] + htmlContents[1], ...htmlContents.slice(2)];
             for (let i = 0; i < newHtmlContents?.length; i++) {
@@ -138,15 +172,10 @@ async function convertToPDF(event, inputFilePath) {
                     .catch((error) => console.error("Lỗi khi tạo file PDF:", error));
             }
         }
-        // console.log('htmlContents', htmlContents);
-        // console.log("pdfPaths", pdfPaths);
         try { 
-            // Send email with PDF attachment
-            // await sendEmailWithAttachments(pdfPaths)
-                // Xử lý yêu cầu lấy danh sách PDF từ renderer process
+            // Xử lý yêu cầu lấy danh sách PDF từ renderer process
             event.sender.send('pdf-list', pdfPaths);
             event.sender.send('loading-pdf-success');
-            // ipcRenderer.send('pdf-paths', pdfPaths);
             console.log('Email sent successfully!');
         } catch (error) {
             event.sender.send('loading-pdf-fail');

@@ -50,12 +50,33 @@
         font-size: 20px;
         font-weight: 600;
       }
+
+      #go-to-setting {
+        position: absolute;
+        top: 10px; /* Đặt top để căn đối tượng với phía trên */
+        right: 25px; /* Đặt right để cách lề phải */
+        padding: 15px 30px; /* Kích thước nút */
+        font-size: 20px; /* Kích thước chữ */
+        background-color: #007bff; /* Màu nền của nút (màu xanh) */
+        color: #fff; /* Màu chữ của nút (trắng) */
+        border: none; /* Loại bỏ viền */
+        border-radius: 5px; /* Bo góc */
+        cursor: pointer; /* Hiển thị con trỏ khi rê chuột vào nút */
+        transition: all 0.3s ease; /* Hiệu ứng chuyển đổi */
+      }
+
+      #go-to-setting:hover {
+        background-color: #45a049; /* Màu nền của nút khi di chuột qua (màu xanh nhạt) */
+      }
     </style>
   </head>
   <body>
     <body>
       <div id="header">CẮT FILE WORD</div>
-      <div id="drop-area">
+      <button id="go-to-setting">
+        Cài Đặt
+      </button>
+        <div id="drop-area">
         <span class="drop-text"></span>
         <button id="open-file">Chọn Đề</button>
         <div class="text-input-file">Hoặc Thả Tại Đây!</div>
