@@ -4,6 +4,10 @@ document.getElementById("open-file").addEventListener("click", () => {
   ipcRenderer.send("open-file-dialog");
 });
 
+document.getElementById("go-to-setting").addEventListener("click", () => {
+  window.location.href = `../Setting/index.html`;
+});
+
 ipcRenderer.on("open-file-selected", (event, filePath) => {
   ipcRenderer.send('file-path', filePath);
   window.location.href = `../Review/index.html`;
@@ -53,7 +57,6 @@ function handleDrop(e) {
     if (/\.(doc|docx|dot|dotx|dotm)$/i.test(fileName)) {
       // Xử lý chỉ khi có một file Word
       const file = files[0];
-      console.log('Dropped file:', file);
       // Xử lý tệp ở đây
       ipcRenderer.send('file-path', file?.path);
       window.location.href = `../Review/index.html`;

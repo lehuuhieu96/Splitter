@@ -6,6 +6,9 @@
     body {
       font-family: "Arial", sans-serif;
     }
+    h1 {
+      text-align: center;
+    }
     .container {
       max-width: 400px;
       margin: 0 auto;
@@ -39,11 +42,21 @@
       font-size: 14px;
       margin-top: 5px;
     }
+    .btn-center {
+      display: flex;
+      justify-content: center;
+    }
+
+    .button-padding {
+        margin: 0 10px;
+        font-size: 20px;
+        border-radius: 5px;
+      }
   </style>
 </head>
 <body>
     <div class="container">
-        <h2>Gửi Email</h2>
+        <h1>Gửi Email</h1>
         <form id="mail-form">
           <div class="form-group">
             <label for="email">Email của bạn:</label>
@@ -76,8 +89,8 @@
             <input type="text" id="question-range" name="question-range" placeholder="Ví dụ: 1-27" >
             <div id="question-range-error" class="error-message"></div>
           </div>
-          <div class="form-group">
-            <input type="submit" value="Gửi Email">
+          <div class="form-group btn-center">
+            <input class="button-padding" type="submit" value="Gửi Email">
           </div>
         </form>
 

@@ -5,7 +5,6 @@ document
   .addEventListener("change", function (event) {
     const passwordInput = document.getElementById("password");
     const showPasswordCheckbox = document.getElementById("show-password");
-
     if (showPasswordCheckbox.checked) {
       passwordInput.type = "text";
     } else {
@@ -119,4 +118,10 @@ ipcRenderer.on("send-mail-success", () => {
 
 ipcRenderer.on("send-mail-fail", () => {
     alert('Email đã được gửi thất bại!');
+});
+
+ipcRenderer.on('data-loaded', (event, data) => {
+  // Sử dụng dữ liệu tại đây
+  document.getElementById('email').value = data[data.length-1]?.email || '';
+  document.getElementById('password').value = data[data.length-1]?.password || '';
 });

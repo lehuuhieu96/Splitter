@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    body {
+      font-family: "Arial", sans-serif;
+    }
+    h1 {
+      text-align: center;
+    }
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    .form-group-setting {
+      margin-bottom: 15px;
+    }
+    .form-group-setting label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .form-group-setting input[type="text"],
+    .form-group-setting input[type="password"],
+    .form-group-setting textarea {
+      width: 100%;
+      padding: 8px;
+      font-size: 16px;
+    }
+    .form-group-setting textarea {
+      height: 100px;
+    }
+    .form-group-setting input[type="submit"] {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+    .error-message {
+      color: red;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+
+    #go-back-btn {
+        position: absolute;
+        top: 10px; /* Đặt top để căn đối tượng với phía trên */
+        left: 25px; /* Đặt right để cách lề phải */
+        padding: 15px 30px; /* Kích thước nút */
+        font-size: 20px; /* Kích thước chữ */
+        background-color: #007bff; /* Màu nền của nút (màu xanh) */
+        color: #fff; /* Màu chữ của nút (trắng) */
+        border: none; /* Loại bỏ viền */
+        border-radius: 5px; /* Bo góc */
+        cursor: pointer; /* Hiển thị con trỏ khi rê chuột vào nút */
+        transition: all 0.3s ease; /* Hiệu ứng chuyển đổi */
+      }
+
+      #go-back-btn:hover {
+        background-color: #45a049; /* Màu nền của nút khi di chuột qua (màu xanh nhạt) */
+      }
+      .btn-center {
+        display: flex;
+        justify-content: center;
+      }
+      .button-padding {
+        margin: 0 10px;
+        font-size: 20px;
+        border-radius: 5px;
+      }
+
+      #delete {
+        padding: 0 20px;
+        font-size: 20px;
+        background-color: #e42222;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer; /* Hiển thị con trỏ khi rê chuột vào nút */
+      }
+  </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gửi Email</h1>
+        <form id="setting-form">
+          <div class="form-group-setting">
+            <label for="email">Email của bạn:</label>
+            <input type="text" id="email" name="email" required>
+            <div id="email-setting-error" class="error-message"></div>
+          </div>
+          <div class="form-group-setting">
+            <label for="password">Mật khẩu:</label>
+            <input type="password" id="password" name="password" >
+            <input type="checkbox" id="show-password">
+            <div id="password-setting-error" class="error-message"></div>
+          </div>
+          <div class="form-group-setting">
+            <label for="link">Image Magick:</label>
+            <input type="text" id="link" name="link" >
+            <div id="link-setting-error" class="error-message"></div>
+          </div>
+
+          <div class="form-group-setting">
+            <label for="header">Word header:</label>
+            <input type="text" id="header" name="header" >
+          </div>
+
+          <div class="form-group-setting">
+            <label for="footer">Word footer:</label>
+            <input type="text" id="footer" name="footer" >
+          </div>
+
+          <div class="form-group-setting">
+            <label for="watermark">Word watermark:</label>
+            <input type="text" id="watermark" name="watermark" >
+          </div>
+          <span class="form-group-setting btn-center">
+            <input class="button-padding" type="submit" value="Lưu">
+            <button id="delete" type="button">Xóa</button>
+          </span>
+        </form>
+        <button id="go-back-btn">Quay lại</button>
+
+        <script src="../../renderer/setting.js"></script>
+    </body>
+</html>
