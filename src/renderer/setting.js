@@ -134,6 +134,7 @@ ipcRenderer.on("data-loaded", (event, data) => {
   document.getElementById("footer").value = data?.footer || "";
   document.getElementById("watermark").value =
     data?.watermark || "";
+  document.getElementById("style-split").value = data?.styleSplit || "";
   const imgElement = document.getElementById("preview-image");
   if(data?.imageBackground) {
     imgElement.src = data?.imageBackground;
@@ -167,6 +168,7 @@ ipcRenderer.on("data-deleted", () => {
   document.getElementById("header").value = "";
   document.getElementById("footer").value = "";
   document.getElementById("watermark").value = "";
+  document.getElementById("style-split").value = "";
   const imgElement = document.getElementById("preview-image");
   imgElement.style.display = 'none';
   const imgHeaderElement = document.getElementById("preview-image-header");

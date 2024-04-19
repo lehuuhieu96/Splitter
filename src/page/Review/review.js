@@ -158,6 +158,8 @@ function addPrefixToOlLi(str, index) {
 }
 
 async function convertToPDF(event, inputFilePath) {
+    const data = loadData();
+    const styleSplit = data?.styleSplit || "Câu";
     try {
         const value = await mammoth.convertToHtml({ path: inputFilePath });
 
@@ -165,13 +167,13 @@ async function convertToPDF(event, inputFilePath) {
         let pdfPaths = []
         // let htmlContents = value?.value?.split(/(?=<p><strong>Câu|<p>Câu|<ol><li>)/).map((str, index) => addPrefixToOlLi(str, index + 1));;
         // let htmlContents = value?.value?.split(/(?=<p><strong>Câu|<strong>Câu|<p>Câu|<ol><li>)/).filter(item => item.startsWith('<p><strong>Câu') || item.startsWith('<p><strong>Câu') || item.startsWith('<p>Câu') || item.startsWith('<ol><li>'));
-        let htmlContents = value?.value?.split(/(?=<p><strong>Câu|<p>Câu|<ol><li>)/);
-        if(!htmlContents[0].startsWith('<p><strong>Câu') || !htmlContents[0].startsWith('<p>Câu') || !htmlContents[0].startsWith('<ol><li>')){
+        let htmlContents = value?.value?.split(new RegExp(`(?=<p><strong>${styleSplit}|<p>${styleSplit})`));
+        if(htmlContents.length > 1 && (!htmlContents[0].startsWith(`<p><strong>${styleSplit}`) || !htmlContents[0].startsWith(`<p>${styleSplit}`))){
             let newHtmlContents = [htmlContents[0] + htmlContents[1], ...htmlContents.slice(2)];
             for (let i = 0; i < newHtmlContents?.length; i++) {
                 const paragraph = newHtmlContents[i];
                 // Tạo tệp PDF cho câu hỏi
-                const pdfFilePath = `Câu_${i + 1}_${fileName}.pdf`;
+                const pdfFilePath = `${styleSplit}_${i + 1}_${fileName}.pdf`;
                 await createPdfFromHtml(paragraph, pdfFilePath)
                     .then(() => pdfPaths.push(pdfFilePath))
                     .catch((error) => console.error("Lỗi khi tạo file PDF:", error));
@@ -180,7 +182,7 @@ async function convertToPDF(event, inputFilePath) {
             for (let i = 0; i < htmlContents?.length; i++) {
                 const paragraph = htmlContents[i];
                 // Tạo tệp PDF cho câu hỏi
-                const pdfFilePath = `Câu_${i + 1}_${fileName}.pdf`;
+                const pdfFilePath = `${styleSplit}_${i + 1}_${fileName}.pdf`;
                 await createPdfFromHtml(paragraph, pdfFilePath)
                     .then(() => pdfPaths.push(pdfFilePath))
                     .catch((error) => console.error("Lỗi khi tạo file PDF:", error));

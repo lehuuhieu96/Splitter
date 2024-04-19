@@ -55,6 +55,8 @@ ipcRenderer.on("loading-pdf-fail", () => {
   loadingOverlay.style.display = 'none';
 });
 
-
+document.getElementById("go-back-btn").addEventListener("click", () => {
+  ipcRenderer.send("go-back");
+});
 
 
