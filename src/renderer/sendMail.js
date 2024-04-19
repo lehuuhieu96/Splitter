@@ -23,7 +23,6 @@ document
     const recipient = document.getElementById("recipient").value;
     const subject = document.getElementById("subject").value;
     const message = document.getElementById("message").value;
-    const questionRange = document.getElementById("question-range").value;
 
     // Xử lý validate từng trường
     const emailError = validateEmail(email);
@@ -31,7 +30,6 @@ document
     const recipientError = validateEmail(recipient);
     const subjectError = validateField(subject, "Chủ đề");
     const messageError = validateField(message, "Nội dung");
-    const questionRangeError = validateQuestionRange(questionRange);
 
     // Hiển thị thông báo lỗi
     displayError("email-error", emailError);
@@ -39,15 +37,13 @@ document
     displayError("recipient-error", recipientError);
     displayError("subject-error", subjectError);
     displayError("message-error", messageError);
-    displayError("question-range-error", questionRangeError);
 
     if (
       !emailError &&
       !passwordError &&
       !recipientError &&
       !subjectError &&
-      !messageError &&
-      !questionRangeError
+      !messageError
     ) {
       const data = {
         email,
@@ -55,9 +51,10 @@ document
         recipient,
         subject,
         message,
-        questionRange,
       };
       ipcRenderer.send("send-data", data);
+      const loadingOverlay = document.getElementById('loading-overlay');
+      loadingOverlay.style.display = 'block';
     }
   });
 
@@ -93,18 +90,6 @@ function validateField(value, fieldName) {
   return "";
 }
 
-// Hàm validate số câu hỏi
-function validateQuestionRange(questionRange) {
-  if (!questionRange) {
-    return "Vui lòng nhập số câu hỏi bạn muốn gửi.";
-  }
-  const rangeRegex = /^\d+-\d+$/;
-  if (!rangeRegex.test(questionRange)) {
-    return "Vui lòng nhập số câu hỏi trong định dạng số-số.";
-  }
-  return "";
-}
-
 // Hàm hiển thị thông báo lỗi
 function displayError(elementId, errorMessage) {
   const errorElement = document.getElementById(elementId);
@@ -112,16 +97,25 @@ function displayError(elementId, errorMessage) {
 }
 
 ipcRenderer.on("send-mail-success", () => {
-    alert('Email đã được gửi thành công!');
-    window.location.href = `../Home/index.html`;
+    const loadingOverlay = document.getElementById('loading-overlay');
+    loadingOverlay.style.display = 'none';
+    ipcRenderer.send("send-email-success");
 });
 
 ipcRenderer.on("send-mail-fail", () => {
-    alert('Email đã được gửi thất bại!');
+    const loadingOverlay = document.getElementById('loading-overlay');
+    loadingOverlay.style.display = 'none';
+    ipcRenderer.send("send-email-fail");
 });
 
 ipcRenderer.on('data-loaded', (event, data) => {
   // Sử dụng dữ liệu tại đây
-  document.getElementById('email').value = data[data.length-1]?.email || '';
-  document.getElementById('password').value = data[data.length-1]?.password || '';
+  document.getElementById('email').value = data?.email || '';
+  document.getElementById('password').value = data?.password || '';
+  document.getElementById('subject').value = data?.fileName || '';
+});
+
+document.getElementById("go-back-btn").addEventListener("click", () => {
+  ipcRenderer.send("get-pdf-list");
+  ipcRenderer.send("go-back");
 });

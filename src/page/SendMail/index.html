@@ -6,6 +6,34 @@
     body {
       font-family: "Arial", sans-serif;
     }
+    #loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.7); /* Một màu trắng trong suốt */
+      display: none; /* Ẩn ban đầu */
+      z-index: 9999; /* Số nguyên dương lớn hơn để overlay nằm trên tất cả các phần tử khác */
+    }
+
+    .loading-spinner {
+      border: 5px solid #f3f3f3; /* Màu viền */
+      border-top: 5px solid #3498db; /* Màu viền đỉnh */
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite; /* Hiệu ứng quay vòng */
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
     h1 {
       text-align: center;
     }
@@ -48,13 +76,33 @@
     }
 
     .button-padding {
-        margin: 0 10px;
-        font-size: 20px;
-        border-radius: 5px;
-      }
+      margin: 0 10px;
+      font-size: 20px;
+      border-radius: 5px;
+    }
+    #go-back-btn {
+      position: absolute;
+      top: 10px; /* Đặt top để căn đối tượng với phía trên */
+      left: 20px; /* Đặt right để cách lề phải */
+      padding: 15px 30px; /* Kích thước nút */
+      font-size: 20px; /* Kích thước chữ */
+      background-color: #007bff; /* Màu nền của nút (màu xanh) */
+      color: #fff; /* Màu chữ của nút (trắng) */
+      border: none; /* Loại bỏ viền */
+      border-radius: 5px; /* Bo góc */
+      cursor: pointer; /* Hiển thị con trỏ khi rê chuột vào nút */
+      transition: all 0.3s ease; /* Hiệu ứng chuyển đổi */
+    }
+
+    #go-back-btn:hover {
+      background-color: #45a049; /* Màu nền của nút khi di chuột qua (màu xanh nhạt) */
+    }
   </style>
 </head>
 <body>
+    <div id="loading-overlay">
+      <div class="loading-spinner"></div>
+    </div>
     <div class="container">
         <h1>Gửi Email</h1>
         <form id="mail-form">
@@ -64,7 +112,7 @@
             <div id="email-error" class="error-message"></div>
           </div>
           <div class="form-group">
-            <label for="password">Mật khẩu:</label>
+            <label for="password">Mật khẩu email:</label>
             <input type="password" id="password" name="password" >
             <input type="checkbox" id="show-password">
             <div id="password-error" class="error-message"></div>
@@ -84,15 +132,11 @@
             <textarea id="message" name="message" ></textarea>
             <div id="message-error" class="error-message"></div>
           </div>
-          <div class="form-group">
-            <label for="question-range">Số câu hỏi:</label>
-            <input type="text" id="question-range" name="question-range" placeholder="Ví dụ: 1-27" >
-            <div id="question-range-error" class="error-message"></div>
-          </div>
           <div class="form-group btn-center">
             <input class="button-padding" type="submit" value="Gửi Email">
           </div>
         </form>
+        <button id="go-back-btn">Quay lại</button>
 
   <script src="../../renderer/sendMail.js"></script>
   </body>

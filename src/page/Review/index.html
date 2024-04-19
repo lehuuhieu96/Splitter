@@ -43,17 +43,13 @@
       #thumbnails {
         display: flex;
         flex-wrap: wrap;
-        gap: 10px;
         padding: 20px;
-        position: absolute;
-        top: 75px; /* Đặt top để tránh che phủ phần tử trên */
-        left: 20px; /* Đặt left để cách lề trái */
       }
 
       #go-to-send-mail {
         position: absolute;
         top: 10px; /* Đặt top để căn đối tượng với phía trên */
-        right: 25px; /* Đặt right để cách lề phải */
+        right: 20px; /* Đặt right để cách lề phải */
         padding: 15px 30px; /* Kích thước nút */
         font-size: 20px; /* Kích thước chữ */
         background-color: #007bff; /* Màu nền của nút (màu xanh) */
@@ -85,16 +81,16 @@
         max-height: 100%; /* Giới hạn chiều cao tối đa của embed */
       }
 
-      embed:hover {
+      /* embed:hover {
         transform: scale(1.1);
         transform-origin: center;
-      }
+      } */
 
       .pdf-container {
         display: flex;
         flex-direction: column;
         align-items: center;
-        border: 1px solid #ccc; 
+        /* border: 1px solid #ccc;  */
         padding: 10px;
       }
 
@@ -120,29 +116,67 @@
       }
 
       #file-info {
-        position: absolute;
-        top: 35px; /* Đặt top để tránh che phủ phần tử trên */
-        left: 40px; /* Đặt left để cách lề trái */
+        padding-top: 70px; /* Đặt top để tránh che phủ phần tử trên */
+        padding-left: 20px; /* Đặt left để cách lề trái */
       }
       p {
         font-size: 25px;
-        font-weight: 700;
-        white-space: nowrap; /* Ngăn chặn việc xuống dòng */
-        text-overflow: ellipsis; /* Hiển thị dấu ba chấm (...) khi nội dung vượt quá */
+        font-weight: bold;
+        margin: 0;
+      }
+      #go-back-btn {
+        position: absolute;
+        top: 10px; /* Đặt top để căn đối tượng với phía trên */
+        left: 20px; /* Đặt right để cách lề phải */
+        padding: 15px 30px; /* Kích thước nút */
+        font-size: 20px; /* Kích thước chữ */
+        background-color: #007bff; /* Màu nền của nút (màu xanh) */
+        color: #fff; /* Màu chữ của nút (trắng) */
+        border: none; /* Loại bỏ viền */
+        border-radius: 5px; /* Bo góc */
+        cursor: pointer; /* Hiển thị con trỏ khi rê chuột vào nút */
+        transition: all 0.3s ease; /* Hiệu ứng chuyển đổi */
+      }
+
+      #go-back-btn:hover {
+        background-color: #45a049; /* Màu nền của nút khi di chuột qua (màu xanh nhạt) */
+      }
+      .question-send {
+        padding-left: 20px; /* Đặt left để cách lề trái */
+        font-size: 20px;
+      }
+
+      .question-send input[type="text"] {
+        width: 150px;
+        padding: 8px;
+        font-size: 16px;
+      }
+      .error-message {
+        color: red;
+        font-size: 14px;
+        margin-top: 5px;
       }
     </style>
   </head>
   <body>
     <!-- Danh sách PDF sẽ được hiển thị ở đây -->
     <div id="loading-overlay">
-      <div class="loading-spinner"></div> <!-- Spinner -->
+      <div class="loading-spinner"></div>
     </div>
     <h1>Danh sách câu hỏi</h1>
     <div id="file-info"></div>
+
+    <div class="question-send">
+      <label for="question-range">Số câu muốn gửi:</label>
+      <input type="text" id="question-range" name="question-range" placeholder="Ví dụ: 1-1, 2-27" >
+      <div id="question-range-error" class="error-message"></div>
+    </div>
+
     <div id="thumbnails"></div>
     <button id="go-to-send-mail">
       Gửi qua email
     </button>
+    <button id="go-back-btn">Quay lại</button>
 
     <script src="../../renderer/review.js"></script>
   </body>

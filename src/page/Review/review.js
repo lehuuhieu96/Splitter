@@ -6,10 +6,22 @@ const exec = promisify(require('child_process').exec);
 const path = require('path');
 const nodemailer = require('nodemailer');
 const fs = require('fs');
+const Store = require('electron-store');
+
+const store = new Store();
 
 function registerEvents() {
     ipcMain.on("file-path", (event, filePath) => {
         convertToPDF(event, filePath);
+    });
+
+    ipcMain.on("get-pdf-list", (event) => {
+        // Lấy danh sách PDF từ nơi lưu trữ hoặc bất kỳ nguồn dữ liệu nào khác
+        const pdfPaths = store.get("pdfPaths");
+        // Gửi danh sách PDF về Renderer Process
+        setTimeout(() => {
+            event.sender.send("pdf-list", pdfPaths);
+        }, 500);
     });
 }
 
@@ -27,9 +39,12 @@ function loadData() {
 
 async function createPdfFromHtml(htmlContent, outputPath) {
     const data = loadData();
-    const header = data[data.length-1]?.header || '';
-    const footer = data[data.length-1]?.footer || '';
-    const watermark = data[data.length-1]?.watermark || '';
+    const header = data?.header || '';
+    const footer = data?.footer || '';
+    const watermark = data?.watermark || '';
+    const imageBackground = data?.imageBackground || '';
+    const imageHeader = data?.imageHeader || '';
+    const imageFooter = data?.imageFooter || '';
 
     const processedHtml = `
         <!DOCTYPE html>
@@ -42,27 +57,31 @@ async function createPdfFromHtml(htmlContent, outputPath) {
                     left: 50%;
                     transform: translate(-50%, -50%);
                     font-size: 100px;
-                    opacity: 0.1;
+                    opacity: 0.2;
                     z-index: -1;
                 }
                 body {
                     font-size: 22px; /* Đặt kích thước chữ mong muốn */
-                    // background: url('../../images/IMG_20171115_215912.jpg') no-repeat center center;
-                    // background-size: cover;
                 }
                 pre, p, div, span { 
                     white-space: pre-wrap; 
+                }
+                .margin-non {
+                    margin: 0;
                 }
             </style>
         </head>
         <body>
             <header>
-                <h3>${header}</h3>
+                <h3 class="margin-non">${header}</h3>
+                ${imageHeader ? `<img src="${imageHeader}" id="image-header" class="margin-non" height="40">` : ''}
             </header>
             <div class="watermark">${watermark}</div>
-            ${htmlContent} 
+            ${imageBackground ? `<img src="${imageBackground}" id="image-background" class="watermark" width="350">` : ''}
+            ${htmlContent}
             <footer>
-                <h3>${footer}</h3>
+                <h3 class="margin-non">${footer}</h3>
+                ${imageFooter ? `<img src="${imageFooter}" id="image-header" class="margin-non" height="40">` : ''}
             </footer>
         </body>
         </html>
@@ -93,11 +112,18 @@ async function createPdfFromHtml(htmlContent, outputPath) {
                 node.setAttribute('src', dataUrl);
             }, image, pngDataUrl);
         }
-        if (src && src.startsWith('data:image/png')) {
+        if (src && (src.startsWith('data:image/png') || src.startsWith('data:image/jpeg') || src.startsWith('data:image/jpg'))) {
             // Thay đổi kích thước của hình ảnh
             await page.evaluate((node) => {
-                node.style.width = '32%';
-                node.style.height = 'auto';
+                node.style.cssText = 'width: 32%; height: auto;';
+                const images = document.querySelectorAll('img#image-header'); // Chọn tất cả các thẻ <img> có id="image-header"
+                images.forEach((image) => {
+                    image.style.cssText = 'height: 40px !important; with: auto !important;';
+                });
+                const imageBg = document.querySelectorAll('img#image-background'); // Chọn tất cả các thẻ <img> có id="image-header"
+                imageBg.forEach((image) => {
+                    image.style.cssText = 'width: 350px !important; height: auto !important;';
+                });
             }, image);
         }
     }
@@ -144,6 +170,8 @@ function addPrefixToOlLi(str, index) {
 }
 
 async function convertToPDF(event, inputFilePath) {
+    const data = loadData();
+    const styleSplit = data?.styleSplit || "Câu";
     try {
         const value = await mammoth.convertToHtml({ path: inputFilePath });
 
@@ -151,13 +179,13 @@ async function convertToPDF(event, inputFilePath) {
         let pdfPaths = []
         // let htmlContents = value?.value?.split(/(?=<p><strong>Câu|<p>Câu|<ol><li>)/).map((str, index) => addPrefixToOlLi(str, index + 1));;
         // let htmlContents = value?.value?.split(/(?=<p><strong>Câu|<strong>Câu|<p>Câu|<ol><li>)/).filter(item => item.startsWith('<p><strong>Câu') || item.startsWith('<p><strong>Câu') || item.startsWith('<p>Câu') || item.startsWith('<ol><li>'));
-        let htmlContents = value?.value?.split(/(?=<p><strong>Câu|<p>Câu|<ol><li>)/);
-        if(!htmlContents[0].startsWith('<p><strong>Câu') || !htmlContents[0].startsWith('<p>Câu') || !htmlContents[0].startsWith('<ol><li>')){
+        let htmlContents = value?.value?.split(new RegExp(`(?=<p><strong>${styleSplit}|<p>${styleSplit})`));
+        if(htmlContents.length > 1 && (!htmlContents[0].startsWith(`<p><strong>${styleSplit}`) || !htmlContents[0].startsWith(`<p>${styleSplit}`))){
             let newHtmlContents = [htmlContents[0] + htmlContents[1], ...htmlContents.slice(2)];
             for (let i = 0; i < newHtmlContents?.length; i++) {
                 const paragraph = newHtmlContents[i];
                 // Tạo tệp PDF cho câu hỏi
-                const pdfFilePath = `Câu_${i + 1}_${fileName}.pdf`;
+                const pdfFilePath = `${styleSplit}_${i + 1}_${fileName}.pdf`;
                 await createPdfFromHtml(paragraph, pdfFilePath)
                     .then(() => pdfPaths.push(pdfFilePath))
                     .catch((error) => console.error("Lỗi khi tạo file PDF:", error));
@@ -166,7 +194,7 @@ async function convertToPDF(event, inputFilePath) {
             for (let i = 0; i < htmlContents?.length; i++) {
                 const paragraph = htmlContents[i];
                 // Tạo tệp PDF cho câu hỏi
-                const pdfFilePath = `Câu_${i + 1}_${fileName}.pdf`;
+                const pdfFilePath = `${styleSplit}_${i + 1}_${fileName}.pdf`;
                 await createPdfFromHtml(paragraph, pdfFilePath)
                     .then(() => pdfPaths.push(pdfFilePath))
                     .catch((error) => console.error("Lỗi khi tạo file PDF:", error));
@@ -175,10 +203,7 @@ async function convertToPDF(event, inputFilePath) {
         try { 
             // Xử lý yêu cầu lấy danh sách PDF từ renderer process
             event.sender.send('pdf-list', pdfPaths);
-            event.sender.send('loading-pdf-success');
-            console.log('Email sent successfully!');
         } catch (error) {
-            event.sender.send('loading-pdf-fail');
             console.error(`Error: ${error.message}`);
         }
     } catch (error) {
@@ -197,7 +222,6 @@ function getFileName(filePath) {
 }
 
 const sendEmailWithAttachments = async (pdfPaths) => {
-    console.log('pdfPaths', pdfPaths);
     try {
         // Create a nodemailer transporter
         let transporter = nodemailer.createTransport({
