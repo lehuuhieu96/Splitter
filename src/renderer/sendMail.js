@@ -124,4 +124,10 @@ ipcRenderer.on('data-loaded', (event, data) => {
   // Sử dụng dữ liệu tại đây
   document.getElementById('email').value = data?.email || '';
   document.getElementById('password').value = data?.password || '';
+  document.getElementById('subject').value = data?.fileName || '';
+});
+
+document.getElementById("go-back-btn").addEventListener("click", () => {
+  ipcRenderer.send("get-pdf-list");
+  ipcRenderer.send("go-back");
 });

@@ -6,10 +6,22 @@ const exec = promisify(require('child_process').exec);
 const path = require('path');
 const nodemailer = require('nodemailer');
 const fs = require('fs');
+const Store = require('electron-store');
+
+const store = new Store();
 
 function registerEvents() {
     ipcMain.on("file-path", (event, filePath) => {
         convertToPDF(event, filePath);
+    });
+
+    ipcMain.on("get-pdf-list", (event) => {
+        // Lấy danh sách PDF từ nơi lưu trữ hoặc bất kỳ nguồn dữ liệu nào khác
+        const pdfPaths = store.get("pdfPaths");
+        // Gửi danh sách PDF về Renderer Process
+        setTimeout(() => {
+            event.sender.send("pdf-list", pdfPaths);
+        }, 500);
     });
 }
 
@@ -62,14 +74,14 @@ async function createPdfFromHtml(htmlContent, outputPath) {
         <body>
             <header>
                 <h3 class="margin-non">${header}</h3>
-                ${imageHeader ? `<img src="${imageHeader}" id="image-header" class="margin-non">` : ''}
+                ${imageHeader ? `<img src="${imageHeader}" id="image-header" class="margin-non" height="35">` : ''}
             </header>
             <div class="watermark">${watermark}</div>
-            ${imageBackground ? `<img src="${imageBackground}" id="image-background" class="watermark">` : ''}
+            ${imageBackground ? `<img src="${imageBackground}" id="image-background" class="watermark" width="350">` : ''}
             ${htmlContent}
             <footer>
                 <h3 class="margin-non">${footer}</h3>
-                ${imageFooter ? `<img src="${imageFooter}" id="image-header" class="margin-non">` : ''}
+                ${imageFooter ? `<img src="${imageFooter}" id="image-header" class="margin-non" height="35">` : ''}
             </footer>
         </body>
         </html>
@@ -100,7 +112,7 @@ async function createPdfFromHtml(htmlContent, outputPath) {
                 node.setAttribute('src', dataUrl);
             }, image, pngDataUrl);
         }
-        if (src && src.startsWith('data:image/png')) {
+        if (src && (src.startsWith('data:image/png') || src.startsWith('data:image/jpeg') || src.startsWith('data:image/jpg'))) {
             // Thay đổi kích thước của hình ảnh
             await page.evaluate((node) => {
                 node.style.cssText = 'width: 32%; height: auto;';
@@ -110,7 +122,7 @@ async function createPdfFromHtml(htmlContent, outputPath) {
                 });
                 const imageBg = document.querySelectorAll('img#image-background'); // Chọn tất cả các thẻ <img> có id="image-header"
                 imageBg.forEach((image) => {
-                    image.style.cssText = 'width: 300px !important; height: auto !important;';
+                    image.style.cssText = 'width: 350px !important; height: auto !important;';
                 });
             }, image);
         }
@@ -191,10 +203,7 @@ async function convertToPDF(event, inputFilePath) {
         try { 
             // Xử lý yêu cầu lấy danh sách PDF từ renderer process
             event.sender.send('pdf-list', pdfPaths);
-            event.sender.send('loading-pdf-success');
-            console.log('Email sent successfully!');
         } catch (error) {
-            event.sender.send('loading-pdf-fail');
             console.error(`Error: ${error.message}`);
         }
     } catch (error) {

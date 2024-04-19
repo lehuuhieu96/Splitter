@@ -1,7 +1,15 @@
-const { ipcRenderer, dialog, BrowserWindow } = require("electron");
+const { ipcRenderer, ipcMain, dialog, BrowserWindow } = require("electron");
+const Store = require('electron-store');
 
+const store = new Store();
 // Lắng nghe sự kiện từ main process khi danh sách PDF được gửi từ main process
 ipcRenderer.on("pdf-list", (event, pdfPaths) => {
+  store.set('pdfPaths', pdfPaths);
+  displayPDFList(pdfPaths);
+});
+
+// Hàm hiển thị danh sách PDF
+function displayPDFList(pdfPaths) {
   const fileInfo = document.getElementById("file-info");
   const fileName = pdfPaths[0].slice(6, -4);
   const fileNamePdf = document.createElement("p");
@@ -37,26 +45,14 @@ ipcRenderer.on("pdf-list", (event, pdfPaths) => {
       console.error("Error extracting thumbnails:", error);
     }
   }
-
+  const loadingOverlay = document.getElementById('loading-overlay');
+  loadingOverlay.style.display = 'none';
   document.getElementById("go-to-send-mail").addEventListener("click", () => {
     window.location.href = `../SendMail/index.html`;
     ipcRenderer.send('path-to-send-mail', pdfPaths);
   });
-});
-
-
-ipcRenderer.on("loading-pdf-success", () => {
-  const loadingOverlay = document.getElementById('loading-overlay');
-  loadingOverlay.style.display = 'none';
-});
-
-ipcRenderer.on("loading-pdf-fail", () => {
-  const loadingOverlay = document.getElementById('loading-overlay');
-  loadingOverlay.style.display = 'none';
-});
+}
 
 document.getElementById("go-back-btn").addEventListener("click", () => {
   ipcRenderer.send("go-back");
 });
-
-
