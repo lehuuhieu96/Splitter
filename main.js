@@ -34,7 +34,7 @@ function createWindow() {
     // Xử lý sự kiện lấy dữ liệu khi cửa sổ đã sẵn sàng
     mainWindow.webContents.on('did-finish-load', () => {
         const data = loadData();
-        const imagemagickPath = data[data.length-1]?.link || ""; // Thay đổi đường dẫn này để phản ánh đường dẫn thực tế
+        const imagemagickPath = data?.link || ""; // Thay đổi đường dẫn này để phản ánh đường dẫn thực tế
         process.env.PATH = `${imagemagickPath}${path.delimiter}${process.env.PATH}`;
         mainWindow.webContents.send('data-loaded', data);
     });
@@ -80,16 +80,68 @@ app.on("ready", createWindow);
 ipcMain.on('save-data', (event, data) => {
     const filePath = path.join(app.getPath('userData'), 'data.json');
     // Đọc dữ liệu hiện có (nếu có)
-    let existingData = [];
-    if (fs.existsSync(filePath)) {
-        existingData = JSON.parse(fs.readFileSync(filePath));
-    }
-    // Thêm dữ liệu mới vào mảng
-    existingData.push(data);
+    const dataToSave = { ...data };
     // Ghi dữ liệu vào tệp
-    fs.writeFileSync(filePath, JSON.stringify(existingData, null, 2));
+    fs.writeFileSync(filePath, JSON.stringify(dataToSave, null, 2));
     // Gửi thông báo cho renderer rằng dữ liệu đã được lưu
     event.sender.send('data-saved');
+});
+
+ipcMain.on('save-image-background', (event, imageBackground) => {
+    const filePath = path.join(app.getPath('userData'), 'data.json');
+    // Đảm bảo tệp tồn tại trước khi đọc và cập nhật dữ liệu
+    if (fs.existsSync(filePath)) {
+        // Đọc dữ liệu hiện có từ tệp JSON
+        const existingData = JSON.parse(fs.readFileSync(filePath));
+        // Thêm cặp key-value mới vào đối tượng dữ liệu
+        existingData["imageBackground"] = imageBackground;
+        // Ghi đối tượng dữ liệu đã cập nhật vào tệp JSON
+        fs.writeFileSync(filePath, JSON.stringify(existingData, null, 2));
+        // Gửi thông báo cho renderer rằng dữ liệu đã được thêm vào
+        event.sender.send('data-added', imageBackground);
+    } else {
+        // Nếu tệp không tồn tại, bạn có thể xử lý tùy ý, ví dụ: tạo tệp mới
+        console.error('File not found:', filePath);
+        event.sender.send('file-not-found');
+    }
+});
+
+ipcMain.on('save-image-header', (event, imageHeader) => {
+    const filePath = path.join(app.getPath('userData'), 'data.json');
+    // Đảm bảo tệp tồn tại trước khi đọc và cập nhật dữ liệu
+    if (fs.existsSync(filePath)) {
+        // Đọc dữ liệu hiện có từ tệp JSON
+        const existingData = JSON.parse(fs.readFileSync(filePath));
+        // Thêm cặp key-value mới vào đối tượng dữ liệu
+        existingData["imageHeader"] = imageHeader;
+        // Ghi đối tượng dữ liệu đã cập nhật vào tệp JSON
+        fs.writeFileSync(filePath, JSON.stringify(existingData, null, 2));
+        // Gửi thông báo cho renderer rằng dữ liệu đã được thêm vào
+        event.sender.send('data-added', imageHeader);
+    } else {
+        // Nếu tệp không tồn tại, bạn có thể xử lý tùy ý, ví dụ: tạo tệp mới
+        console.error('File not found:', filePath);
+        event.sender.send('file-not-found');
+    }
+});
+
+ipcMain.on('save-image-footer', (event, imageFooter) => {
+    const filePath = path.join(app.getPath('userData'), 'data.json');
+    // Đảm bảo tệp tồn tại trước khi đọc và cập nhật dữ liệu
+    if (fs.existsSync(filePath)) {
+        // Đọc dữ liệu hiện có từ tệp JSON
+        const existingData = JSON.parse(fs.readFileSync(filePath));
+        // Thêm cặp key-value mới vào đối tượng dữ liệu
+        existingData["imageFooter"] = imageFooter;
+        // Ghi đối tượng dữ liệu đã cập nhật vào tệp JSON
+        fs.writeFileSync(filePath, JSON.stringify(existingData, null, 2));
+        // Gửi thông báo cho renderer rằng dữ liệu đã được thêm vào
+        event.sender.send('data-added', imageFooter);
+    } else {
+        // Nếu tệp không tồn tại, bạn có thể xử lý tùy ý, ví dụ: tạo tệp mới
+        console.error('File not found:', filePath);
+        event.sender.send('file-not-found');
+    }
 });
 
 // Xử lý sự kiện xóa dữ liệu đã lưu

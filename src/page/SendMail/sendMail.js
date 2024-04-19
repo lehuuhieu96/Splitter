@@ -10,7 +10,6 @@ function registerEvents() {
 }
 
 const sendEmailWithAttachments = async (pdfPaths) => {
-    console.log('pdfPaths', pdfPaths);
     ipcMain.on("send-data",async (event, data) => {
         const questionRange = data?.questionRange;
         const rangeParts = questionRange.split('-'); // Tách chuỗi thành mảng gồm hai phần tử

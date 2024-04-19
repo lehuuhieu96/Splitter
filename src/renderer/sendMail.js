@@ -122,6 +122,6 @@ ipcRenderer.on("send-mail-fail", () => {
 
 ipcRenderer.on('data-loaded', (event, data) => {
   // Sử dụng dữ liệu tại đây
-  document.getElementById('email').value = data[data.length-1]?.email || '';
-  document.getElementById('password').value = data[data.length-1]?.password || '';
+  document.getElementById('email').value = data?.email || '';
+  document.getElementById('password').value = data?.password || '';
 });

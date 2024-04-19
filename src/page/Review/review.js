@@ -27,9 +27,12 @@ function loadData() {
 
 async function createPdfFromHtml(htmlContent, outputPath) {
     const data = loadData();
-    const header = data[data.length-1]?.header || '';
-    const footer = data[data.length-1]?.footer || '';
-    const watermark = data[data.length-1]?.watermark || '';
+    const header = data?.header || '';
+    const footer = data?.footer || '';
+    const watermark = data?.watermark || '';
+    const imageBackground = data?.imageBackground || '';
+    const imageHeader = data?.imageHeader || '';
+    const imageFooter = data?.imageFooter || '';
 
     const processedHtml = `
         <!DOCTYPE html>
@@ -42,27 +45,31 @@ async function createPdfFromHtml(htmlContent, outputPath) {
                     left: 50%;
                     transform: translate(-50%, -50%);
                     font-size: 100px;
-                    opacity: 0.1;
+                    opacity: 0.2;
                     z-index: -1;
                 }
                 body {
                     font-size: 22px; /* Đặt kích thước chữ mong muốn */
-                    // background: url('../../images/IMG_20171115_215912.jpg') no-repeat center center;
-                    // background-size: cover;
                 }
                 pre, p, div, span { 
                     white-space: pre-wrap; 
+                }
+                .margin-non {
+                    margin: 0;
                 }
             </style>
         </head>
         <body>
             <header>
-                <h3>${header}</h3>
+                <h3 class="margin-non">${header}</h3>
+                ${imageHeader ? `<img src="${imageHeader}" id="image-header" class="margin-non">` : ''}
             </header>
             <div class="watermark">${watermark}</div>
-            ${htmlContent} 
+            ${imageBackground ? `<img src="${imageBackground}" id="image-background" class="watermark">` : ''}
+            ${htmlContent}
             <footer>
-                <h3>${footer}</h3>
+                <h3 class="margin-non">${footer}</h3>
+                ${imageFooter ? `<img src="${imageFooter}" id="image-header" class="margin-non">` : ''}
             </footer>
         </body>
         </html>
@@ -96,8 +103,15 @@ async function createPdfFromHtml(htmlContent, outputPath) {
         if (src && src.startsWith('data:image/png')) {
             // Thay đổi kích thước của hình ảnh
             await page.evaluate((node) => {
-                node.style.width = '32%';
-                node.style.height = 'auto';
+                node.style.cssText = 'width: 32%; height: auto;';
+                const images = document.querySelectorAll('img#image-header'); // Chọn tất cả các thẻ <img> có id="image-header"
+                images.forEach((image) => {
+                    image.style.cssText = 'height: 35px !important; with: auto !important;';
+                });
+                const imageBg = document.querySelectorAll('img#image-background'); // Chọn tất cả các thẻ <img> có id="image-header"
+                imageBg.forEach((image) => {
+                    image.style.cssText = 'width: 300px !important; height: auto !important;';
+                });
             }, image);
         }
     }
@@ -197,7 +211,6 @@ function getFileName(filePath) {
 }
 
 const sendEmailWithAttachments = async (pdfPaths) => {
-    console.log('pdfPaths', pdfPaths);
     try {
         // Create a nodemailer transporter
         let transporter = nodemailer.createTransport({

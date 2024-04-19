@@ -2,7 +2,6 @@ const {  ipcMain, dialog } = require("electron");
 
 function registerEvents() {
     ipcMain.on("open-file-dialog", (event) => {
-        console.log("FFF");
         dialog
             .showOpenDialog({
                 properties: ["openFile"],
