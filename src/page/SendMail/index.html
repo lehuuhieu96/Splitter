@@ -6,6 +6,34 @@
     body {
       font-family: "Arial", sans-serif;
     }
+    #loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.7); /* Một màu trắng trong suốt */
+      display: none; /* Ẩn ban đầu */
+      z-index: 9999; /* Số nguyên dương lớn hơn để overlay nằm trên tất cả các phần tử khác */
+    }
+
+    .loading-spinner {
+      border: 5px solid #f3f3f3; /* Màu viền */
+      border-top: 5px solid #3498db; /* Màu viền đỉnh */
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite; /* Hiệu ứng quay vòng */
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
     h1 {
       text-align: center;
     }
@@ -72,6 +100,9 @@
   </style>
 </head>
 <body>
+    <div id="loading-overlay">
+      <div class="loading-spinner"></div>
+    </div>
     <div class="container">
         <h1>Gửi Email</h1>
         <form id="mail-form">
@@ -81,7 +112,7 @@
             <div id="email-error" class="error-message"></div>
           </div>
           <div class="form-group">
-            <label for="password">Mật khẩu:</label>
+            <label for="password">Mật khẩu email:</label>
             <input type="password" id="password" name="password" >
             <input type="checkbox" id="show-password">
             <div id="password-error" class="error-message"></div>
@@ -100,11 +131,6 @@
             <label for="message">Nội dung:</label>
             <textarea id="message" name="message" ></textarea>
             <div id="message-error" class="error-message"></div>
-          </div>
-          <div class="form-group">
-            <label for="question-range">Số câu hỏi:</label>
-            <input type="text" id="question-range" name="question-range" placeholder="Ví dụ: 1-27" >
-            <div id="question-range-error" class="error-message"></div>
           </div>
           <div class="form-group btn-center">
             <input class="button-padding" type="submit" value="Gửi Email">

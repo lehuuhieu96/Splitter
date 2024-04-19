@@ -162,6 +162,7 @@ document.getElementById("delete").addEventListener("click", () => {
 
 ipcRenderer.on("data-deleted", () => {
   // Sử dụng dữ liệu tại đây
+  ipcRenderer.send("delete-data-success");
   document.getElementById("email").value = "";
   document.getElementById("password").value = "";
   document.getElementById("link").value = "";
@@ -175,6 +176,11 @@ ipcRenderer.on("data-deleted", () => {
   imgHeaderElement.style.display = 'none';
   const imgFooterElement = document.getElementById("preview-image-footer");
   imgFooterElement.style.display = 'none';
+});
+
+ipcRenderer.on("data-saved", () => {
+  // Sử dụng dữ liệu tại đây
+  ipcRenderer.send("save-data-success");
 });
 
 // Lắng nghe sự kiện khi người dùng chọn file hình ảnh

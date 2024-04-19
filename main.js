@@ -4,6 +4,8 @@ const home = require('./src/page/Home/home');
 const review = require('./src/page/Review/review');
 const sendMail = require('./src/page/SendMail/sendMail');
 const setting = require('./src/page/Setting/setting');
+const { setMainWindow } = require('./src/modal/Alert/modalAlert');
+
 const fs = require('fs');
 const Store = require('electron-store');
 
@@ -40,6 +42,7 @@ function createWindow() {
         process.env.PATH = `${imagemagickPath}${path.delimiter}${process.env.PATH}`;
         mainWindow.webContents.send('data-loaded', data);
     });
+    setMainWindow(mainWindow);
 
     // Lắng nghe yêu cầu quay lại từ renderer process
     ipcMain.on('go-back', () => {

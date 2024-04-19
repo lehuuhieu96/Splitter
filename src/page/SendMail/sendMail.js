@@ -3,16 +3,26 @@ const path = require('path');
 const nodemailer = require('nodemailer');
 const fs = require('fs');
 const archiver = require('archiver'); // Module để tạo file zip
+const { createModal } = require('../../modal/Alert/modalAlert');
+const Store = require('electron-store');
+
+const store = new Store();
 
 function registerEvents() {
-    ipcMain.on("path-to-send-mail",async (event, pdfPaths) => {
+    ipcMain.on("path-to-send-mail", async (event, pdfPaths) => {
         await sendEmailWithAttachments(pdfPaths)
+    });
+    ipcMain.on("send-email-success", () => {
+        createModal("Gửi mail thành công!")
+    });
+    ipcMain.on("send-email-fail", () => {
+        createModal("Gửi mail thất bại!")
     });
 }
 
 const sendEmailWithAttachments = async (pdfPaths) => {
     ipcMain.on("send-data",async (event, data) => {
-        const questionRange = data?.questionRange;
+        const questionRange = store.get("questionRange");
         const rangeParts = questionRange.split('-'); // Tách chuỗi thành mảng gồm hai phần tử
         const startIndex = parseInt(rangeParts[0]) - 1; // Lấy vị trí bắt đầu và chuyển đổi sang số nguyên (trừ 1 vì mảng bắt đầu từ 0)
         const endIndex = parseInt(rangeParts[1]); // Lấy vị trí kết thúc và chuyển đổi sang số nguyên

@@ -81,10 +81,10 @@
         max-height: 100%; /* Giới hạn chiều cao tối đa của embed */
       }
 
-      embed:hover {
+      /* embed:hover {
         transform: scale(1.1);
         transform-origin: center;
-      }
+      } */
 
       .pdf-container {
         display: flex;
@@ -141,6 +141,21 @@
       #go-back-btn:hover {
         background-color: #45a049; /* Màu nền của nút khi di chuột qua (màu xanh nhạt) */
       }
+      .question-send {
+        padding-left: 20px; /* Đặt left để cách lề trái */
+        font-size: 20px;
+      }
+
+      .question-send input[type="text"] {
+        width: 150px;
+        padding: 8px;
+        font-size: 16px;
+      }
+      .error-message {
+        color: red;
+        font-size: 14px;
+        margin-top: 5px;
+      }
     </style>
   </head>
   <body>
@@ -150,6 +165,13 @@
     </div>
     <h1>Danh sách câu hỏi</h1>
     <div id="file-info"></div>
+
+    <div class="question-send">
+      <label for="question-range">Số câu muốn gửi:</label>
+      <input type="text" id="question-range" name="question-range" placeholder="Ví dụ: 1-1, 2-27" >
+      <div id="question-range-error" class="error-message"></div>
+    </div>
+
     <div id="thumbnails"></div>
     <button id="go-to-send-mail">
       Gửi qua email

@@ -74,14 +74,14 @@ async function createPdfFromHtml(htmlContent, outputPath) {
         <body>
             <header>
                 <h3 class="margin-non">${header}</h3>
-                ${imageHeader ? `<img src="${imageHeader}" id="image-header" class="margin-non" height="35">` : ''}
+                ${imageHeader ? `<img src="${imageHeader}" id="image-header" class="margin-non" height="40">` : ''}
             </header>
             <div class="watermark">${watermark}</div>
             ${imageBackground ? `<img src="${imageBackground}" id="image-background" class="watermark" width="350">` : ''}
             ${htmlContent}
             <footer>
                 <h3 class="margin-non">${footer}</h3>
-                ${imageFooter ? `<img src="${imageFooter}" id="image-header" class="margin-non" height="35">` : ''}
+                ${imageFooter ? `<img src="${imageFooter}" id="image-header" class="margin-non" height="40">` : ''}
             </footer>
         </body>
         </html>
@@ -118,7 +118,7 @@ async function createPdfFromHtml(htmlContent, outputPath) {
                 node.style.cssText = 'width: 32%; height: auto;';
                 const images = document.querySelectorAll('img#image-header'); // Chọn tất cả các thẻ <img> có id="image-header"
                 images.forEach((image) => {
-                    image.style.cssText = 'height: 35px !important; with: auto !important;';
+                    image.style.cssText = 'height: 40px !important; with: auto !important;';
                 });
                 const imageBg = document.querySelectorAll('img#image-background'); // Chọn tất cả các thẻ <img> có id="image-header"
                 imageBg.forEach((image) => {
