@@ -8,7 +8,8 @@ const { setMainWindow } = require('./src/modal/Alert/modalAlert');
 
 const fs = require('fs');
 const Store = require('electron-store');
-
+const puppeteer = require("puppeteer");
+const { GLOBAL } = require("./global");
 const store = new Store();
 // Thêm đường dẫn đến thư mục bin của ImageMagick vào biến môi trường PATH
 // const imagemagickPath = 'C:/Program Files/ImageMagick-7.1.1-Q16-HDRI'; // Thay đổi đường dẫn này để phản ánh đường dẫn thực tế
@@ -16,7 +17,15 @@ const store = new Store();
 
 let mainWindow;
 
+async function initBrowerPupperteer() {
+    const launched = await puppeteer.launch();
+    GLOBAL.browserPuppeteer = launched;
+}
+
 function createWindow() {
+
+    initBrowerPupperteer();
+
     mainWindow = new BrowserWindow({
         webPreferences: {
             nodeIntegration: true,
@@ -49,6 +58,10 @@ function createWindow() {
         if (mainWindow.webContents.canGoBack()) {
             mainWindow.webContents.goBack();
         }
+    });
+
+    ipcMain.on('go-to-main', () => {
+        mainWindow.loadURL(`file://${__dirname}/src/page/Home/index.html`);
     });
 
     mainWindow.on("closed", function () {
@@ -116,26 +129,6 @@ ipcMain.on('save-image-background', (event, imageBackground) => {
     }
 });
 
-ipcMain.on('file-path', (event, filePath) => {
-    const fileName = getFileName(filePath);
-    const filePathApp = path.join(app.getPath('userData'), 'data.json');
-    // Đảm bảo tệp tồn tại trước khi đọc và cập nhật dữ liệu
-    if (fs.existsSync(filePathApp)) {
-        // Đọc dữ liệu hiện có từ tệp JSON
-        const existingData = JSON.parse(fs.readFileSync(filePathApp));
-        // Thêm cặp key-value mới vào đối tượng dữ liệu
-        existingData["fileName"] = fileName;
-        // Ghi đối tượng dữ liệu đã cập nhật vào tệp JSON
-        fs.writeFileSync(filePathApp, JSON.stringify(existingData, null, 2));
-        // Gửi thông báo cho renderer rằng dữ liệu đã được thêm vào
-        event.sender.send('data-added', fileName);
-    } else {
-        // Nếu tệp không tồn tại, bạn có thể xử lý tùy ý, ví dụ: tạo tệp mới
-        console.error('File not found:', filePathApp);
-        event.sender.send('file-not-found');
-    }
-});
-
 ipcMain.on('save-image-header', (event, imageHeader) => {
     const filePath = path.join(app.getPath('userData'), 'data.json');
     // Đảm bảo tệp tồn tại trước khi đọc và cập nhật dữ liệu
@@ -199,16 +192,6 @@ function loadData() {
     } else {
         return []; // Trả về một mảng rỗng nếu không có dữ liệu
     }
-}
-
-function getFileName(filePath) {
-    // Split the file path by the backslash (\) character
-    const parts = filePath.split('\\');
-    // The last part will be the filename with extension
-    const fileNameWithExtension = parts[parts.length - 1];
-    // Extract the filename without the extension
-    const fileName = fileNameWithExtension.split('.').slice(0, -1).join('.');
-    return fileName;
 }
 
 app.on("window-all-closed", function () {

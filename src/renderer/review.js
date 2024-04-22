@@ -11,7 +11,7 @@ ipcRenderer.on("pdf-list", (event, pdfPaths) => {
 // Hàm hiển thị danh sách PDF
 function displayPDFList(pdfPaths) {
   const fileInfo = document.getElementById("file-info");
-  const fileName = pdfPaths[0].slice(6, -4);
+  const fileName = store.get('fileName') || '';
   const fileNamePdf = document.createElement("p");
   fileNamePdf.textContent = `Đề: ${fileName} gồm ${pdfPaths.length} câu`;
   fileInfo.appendChild(fileNamePdf);

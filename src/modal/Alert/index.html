@@ -8,15 +8,30 @@
           display: flex;
           justify-content: center;
           align-items: center;
+          flex-direction: column; /* Sắp xếp các phần tử theo chiều dọc */
         }
         #modal-message {
           font-size: 26px;
           margin-bottom: 15px;
         }
+        #action-button {
+          margin-top: 15px; /* Khoảng cách giữa nút và #modal-message */
+          background-color: #007bff; /* Màu nền xanh cho nút */
+          color: white; /* Màu chữ trắng cho nút */
+          border: none; /* Loại bỏ viền */
+          border-radius: 5px; /* Bo góc */
+          padding: 10px 20px; /* Kích thước nút */
+          cursor: pointer; /* Hiển thị con trỏ khi di chuột qua nút */
+          font-size: 20px; /* Kích thước chữ */
+        }
+        #action-button:hover {
+          background-color: #45a049; /* Màu nền của nút khi di chuột qua (màu xanh lá cây nhạt) */
+        }
       </style>
   </head>
   <body>
     <div id="modal-message"></div>
+    <button id="action-button">OK</button>
 
     <script src="../../renderer/modalAlert.js"></script>
 </body>
