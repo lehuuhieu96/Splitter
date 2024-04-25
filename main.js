@@ -5,7 +5,6 @@ const review = require('./src/page/Review/review');
 const sendMail = require('./src/page/SendMail/sendMail');
 const setting = require('./src/page/Setting/setting');
 const { setMainWindow } = require('./src/modal/Alert/modalAlert');
-
 const fs = require('fs');
 const Store = require('electron-store');
 const puppeteer = require("puppeteer");
@@ -31,11 +30,9 @@ function createWindow() {
             nodeIntegration: true,
             contextIsolation: false,
         },
-        width: 1160, 
-        height: 760, 
-        minWidth: 1160, 
-        minHeight: 760
     });
+
+    mainWindow.maximize();
 
     home.registerEvents();
     review.registerEvents();
