@@ -13,10 +13,10 @@ function registerEvents() {
         await sendEmailWithAttachments(pdfPaths)
     });
     ipcMain.on("send-email-success", () => {
-        createModal("Gửi mail thành công!")
+        createModal("Gửi mail thành công!", true)
     });
     ipcMain.on("send-email-fail", () => {
-        createModal("Gửi mail thất bại!")
+        createModal("Gửi mail thất bại!", false)
     });
 }
 
@@ -27,9 +27,9 @@ const sendEmailWithAttachments = async (pdfPaths) => {
         const startIndex = parseInt(rangeParts[0]) - 1; // Lấy vị trí bắt đầu và chuyển đổi sang số nguyên (trừ 1 vì mảng bắt đầu từ 0)
         const endIndex = parseInt(rangeParts[1]); // Lấy vị trí kết thúc và chuyển đổi sang số nguyên
         const subPath = pdfPaths.slice(startIndex, endIndex);
-        const fileName = pdfPaths[0].slice(6, -4);
+        const fileName = store.get('fileName') || '';
         try {
-            // Create a nodemailer transporter
+            // Tạo 1 nodemailer transporter
             let transporter = nodemailer.createTransport({
                 service: 'Gmail',
                 auth: {
@@ -43,7 +43,7 @@ const sendEmailWithAttachments = async (pdfPaths) => {
                 fs.mkdirSync(tempDir);
             }
             const zipFilePath = path.join(tempDir, `${fileName}.zip`);
-            await createZip(subPath, zipFilePath); // Assume createZip function creates the zip file
+            await createZip(subPath, zipFilePath); // Tạo zip file 
             // Mail options
             let mailOptions = {
                 from: data?.email,
@@ -51,14 +51,15 @@ const sendEmailWithAttachments = async (pdfPaths) => {
                 subject: data?.subject,
                 text: data?.message,
                 attachments: [{
-                    filename: `${fileName}.zip`, // Name of the zip file
-                    path: zipFilePath // Path to the zip file
+                    filename: `${fileName}.zip`, // Tên file zip
+                    path: zipFilePath 
                 }]
             };
             // Send mail
             // let info = await transporter.sendMail(mailOptions);
             await transporter.sendMail(mailOptions);
             fs.rmSync(tempDir, { recursive: true });
+            await removeAllFile(pdfPaths)
             event.sender.send('send-mail-success', data);
         } catch (error) {
             event.sender.send('send-mail-fail');
@@ -93,5 +94,17 @@ async function createZip(pdfPaths, zipFilePath) {
         archive.finalize();
     });
 }
+
+const removeAllFile = (pdfPaths) => {
+    // Xóa tất cả các tệp PDF trong mảng pdfPaths
+    pdfPaths.forEach(pdfPath => {
+        try {
+            fs.unlinkSync(pdfPath);
+            console.log(`Deleted file: ${pdfPath}`);
+        } catch (error) {
+            console.error(`Error deleting file: ${pdfPath}, ${error.message}`);
+        }
+    });
+};
 
 module.exports = { registerEvents };

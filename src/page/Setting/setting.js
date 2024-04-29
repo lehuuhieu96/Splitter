@@ -3,10 +3,10 @@ const { createModal } = require('../../modal/Alert/modalAlert');
 
 function registerEvents() {
     ipcMain.on("save-data-success", () => {
-        createModal("Lưu thành công!")
+        createModal("Lưu thành công!", false)
     });
     ipcMain.on("delete-data-success", () => {
-        createModal("Xóa thành công!")
+        createModal("Xóa thành công!", false)
     });
 }
 

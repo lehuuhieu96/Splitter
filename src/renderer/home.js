@@ -54,17 +54,17 @@ function handleDrop(e) {
   if (files.length === 1) {
     const fileName = files[0].name;
     // Kiểm tra nếu tên tệp kết thúc bằng một trong các phần mở rộng của file Word
-    if (/\.(doc|docx|dot|dotx|dotm)$/i.test(fileName)) {
+    if (/\.(docx)$/i.test(fileName)) {
       // Xử lý chỉ khi có một file Word
       const file = files[0];
       // Xử lý tệp ở đây
       ipcRenderer.send('file-path', file?.path);
       window.location.href = `../Review/index.html`;
     } else {
-      alert('Vui lòng chỉ thả một file Word (.doc, .docx, .dot, .dotx, .dotm).');
+      alert('Vui lòng chỉ thả một file Word (.docx).');
     }
   } else {
-    alert('Vui lòng chỉ thả một file Word (.doc, .docx, .dot, .dotx, .dotm).');
+    alert('Vui lòng chỉ thả một file Word (.docx).');
   }
 }
 
